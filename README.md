@@ -16,4 +16,6 @@ git clone https://github.com/dipori/buscaminas.git
 
 cd C:\Users\dipori\Documents\repo\buscaminas
 
+python -m pip install auto-py-to-exe
 
+auto-py-to-exe -o .\install .\code\buscaminas.py
