@@ -1,5 +1,7 @@
+# se improtan las librerias
 import pygame
 import random
+import sys
 
 # Configuración del juego
 NUM_FILAS = 9
@@ -7,7 +9,7 @@ NUM_COLS = 9
 CELL_SIZE = 40
 SCREEN_WIDTH = CELL_SIZE * NUM_COLS
 SCREEN_HEIGHT = CELL_SIZE * NUM_FILAS
-PROP_MINAS = 0.1
+PROP_MINAS = 0.05
 GRIS = (192, 192, 192)
 NEGRO = (0, 0, 0)
 final_partida = False
@@ -65,47 +67,70 @@ def muestra(x, y):
                     if (dx != 0 or dy != 0) and (x + dx >= 0 and x + dx < NUM_COLS and y + dy >= 0 and y + dy < NUM_FILAS) and (not mostrado[y+dy][x+dx]):
                         muestra(x+dx, y+dy)
 
-# La función toma las coordenadas x e y de una celda y verifica si hay una mina en esa celda. Si hay una mina, establece la variable final_partida en True y mostrado un mensaje en la consola. Si no hay una mina, establece la celda como mostrada y verifica si la celda está vacía (es decir, no tiene minas adyacentes). Si la celda está vacía, la función llama recursivamente a sí misma para mostrar todas las celdas adyacentes vacías. La recursión se realiza en las celdas adyacentes que no han sido mostradas previamente y que están dentro de los límites del tablero.
 
 
 # Definir función principal
-def main():
-    global final_partida, screen
 
-    # Inicializa Pygame
-    pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Buscaminas")
-    
-    
-    init_tablero()
-    
-    # Bucle principal del juego
-    while not final_partida:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                final_partida = True
-            elif event.type == pygame.MOUSEBUTTONUP:
-                pos = pygame.mouse.get_pos()
-                x = pos[0] // CELL_SIZE
-                y = pos[1] // CELL_SIZE
-                if event.button == 1:  # Click izquierdo
-                    muestra(x, y)
-                elif event.button == 3:  # Click derecho
-                    mostrado[y][x] = not mostrado[y][x]
-        update_screen()
-    
-        # Verificar si el juego ha terminado
-        if not any(False in row for row in mostrado):
-            print("¡Ganaste!")
+# Inicializa Pygame
+pygame.init()
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Buscaminas")
+
+
+init_tablero()
+
+# Bucle principal del juego
+while not final_partida:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
             final_partida = True
-        elif final_partida:
-            print("¡Perdiste!")
-    
-    pygame.quit()
+        elif event.type == pygame.MOUSEBUTTONUP:
+            pos = pygame.mouse.get_pos()
+            x = pos[0] // CELL_SIZE
+            y = pos[1] // CELL_SIZE
+            if event.button == 1:  # Click izquierdo
+                muestra(x, y)
+            elif event.button == 3:  # Click derecho
+                mostrado[y][x] = not mostrado[y][x]
+    update_screen()
 
 
-#Este bucle ejecuta continuamente hasta que el jugador gana o pierde el juego. Dentro del bucle, se verifica si el usuario ha hecho clic en una celda con el mouse y se llama a la función muestra para mostrar la celda. También se llama a la función update_screen para actualizar la pantalla. Después de cada actualización de la pantalla, se verifica si todas las celdas que no son minas han sido mostradas o si el jugador ha mostrado una mina, en cuyo caso se establece la variable final_partida en True. Si el juego ha terminado, se imprime un mensaje en la consola.
+    # Verificar si el juego ha terminado
+    if not any(False in row for row in mostrado):
+        
+        pygame.draw.rect(screen, NEGRO, (1, 1, SCREEN_WIDTH-1, SCREEN_HEIGHT-1))
+                
+        font = pygame.font.Font(None, 36)
+        text = font.render('¡Ganaste!', True, (255, 255, 255))
+        
+        text_rect = text.get_rect()
+        text_rect.center = screen.get_rect().center
+        
+        screen.blit(text, text_rect)
+        
+        pygame.display.flip()
+        
+        final_partida = True
 
-if __name__ == '__main__':
-    main()
+    elif final_partida:
+        
+        pygame.draw.rect(screen, NEGRO, (1, 1, SCREEN_WIDTH-1, SCREEN_HEIGHT-1))
+        
+        font = pygame.font.Font(None, 36)
+        text = font.render('¡Mina encontrada! ¡Perdiste!', True, (255, 255, 255))
+        
+        text_rect = text.get_rect()
+        text_rect.center = screen.get_rect().center
+        
+        screen.blit(text, text_rect)
+        
+        pygame.display.flip()
+
+while True:
+   for event in pygame.event.get():
+       if event.type == pygame.QUIT:
+           pygame.quit()
+           sys.exit()
+
+
+
